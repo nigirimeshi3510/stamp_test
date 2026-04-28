@@ -1,0 +1,193 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QR印刷用ページ</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: "Yu Gothic", Meiryo, system-ui, sans-serif;
+      color: #20242a;
+      background: #f7f5ef;
+    }
+    main {
+      width: min(980px, 100%);
+      margin: 0 auto;
+      padding: 24px;
+    }
+    .toolbar {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 12px;
+      align-items: end;
+      margin-bottom: 18px;
+      padding: 16px;
+      border: 1px solid #dcd7cc;
+      border-radius: 8px;
+      background: #fff;
+    }
+    label {
+      display: grid;
+      gap: 6px;
+      font-weight: 700;
+    }
+    input {
+      width: 100%;
+      min-height: 44px;
+      padding: 8px 10px;
+      border: 1px solid #bfb8ac;
+      border-radius: 6px;
+      font: inherit;
+    }
+    button {
+      min-height: 44px;
+      padding: 0 18px;
+      border: 0;
+      border-radius: 6px;
+      color: #fff;
+      background: #0f8f82;
+      font: inherit;
+      font-weight: 800;
+    }
+    .entry-card {
+      margin-bottom: 18px;
+      padding: 18px;
+      border: 2px solid #0f8f82;
+      border-radius: 8px;
+      background: #f2fffb;
+      text-align: center;
+    }
+    .entry-card h2 {
+      margin: 0 0 10px;
+      font-size: 1.65rem;
+    }
+    .entry-card img {
+      width: min(100%, 220px);
+      aspect-ratio: 1 / 1;
+      image-rendering: pixelated;
+    }
+    .entry-card p,
+    .entry-card a {
+      color: #35504d;
+      overflow-wrap: anywhere;
+    }
+    .entry-card a {
+      font-weight: 800;
+    }
+    .sheet {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 18px;
+    }
+    .qr-card {
+      break-inside: avoid;
+      padding: 18px;
+      border: 2px solid #20242a;
+      border-radius: 8px;
+      background: #fff;
+      text-align: center;
+    }
+    .qr-card h2 {
+      margin: 0 0 14px;
+      font-size: 1.5rem;
+    }
+    .qr-card img {
+      width: min(100%, 260px);
+      aspect-ratio: 1 / 1;
+      image-rendering: pixelated;
+    }
+    .qr-card p {
+      margin: 12px 0 0;
+      color: #555f69;
+      font-size: 0.9rem;
+      overflow-wrap: anywhere;
+    }
+    @media print {
+      body {
+        background: #fff;
+      }
+      .toolbar {
+        display: none;
+      }
+      main {
+        width: 100%;
+        padding: 0;
+      }
+      .entry-card {
+        margin-bottom: 10mm;
+      }
+      .sheet {
+        gap: 12mm;
+      }
+    }
+    @media (max-width: 760px) {
+      .toolbar,
+      .sheet {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <div class="toolbar">
+      <label>
+        公開URL
+        <input id="base-url" value="https://nigirimeshi3510.github.io/stamp_test/">
+      </label>
+      <button id="print-button" type="button">印刷</button>
+    </div>
+    <section class="entry-card" id="entry-card"></section>
+    <section class="sheet" id="sheet"></section>
+  </main>
+  <script>
+    const spots = [
+      { token: "A7K2-MORI", name: "スポット A" },
+      { token: "B4Q9-KAWA", name: "スポット B" },
+      { token: "C8N5-SORA", name: "スポット C" }
+    ];
+    const input = document.getElementById("base-url");
+    const entryCard = document.getElementById("entry-card");
+    const sheet = document.getElementById("sheet");
+
+    function makeUrl(token) {
+      const url = new URL(input.value);
+      url.searchParams.set("s", token);
+      return url.toString();
+    }
+
+    function makeQrImage(url, size = 420) {
+      return `https://api.qrserver.com/v1/create-qr-code/?size=${size}x${size}&data=${encodeURIComponent(url)}`;
+    }
+
+    function render() {
+      const entryUrl = new URL(input.value).toString();
+      entryCard.innerHTML = `
+        <h2>参加者入口</h2>
+        <img alt="参加者入口のQRコード" src="${makeQrImage(entryUrl)}">
+        <p>iPhoneで最初にこのQRを読み取ると、スタンプラリー画面が開きます。</p>
+        <p><a href="${entryUrl}" target="_blank" rel="noreferrer">スマホで開くURL: ${entryUrl}</a></p>
+      `;
+
+      sheet.innerHTML = "";
+      spots.forEach((spot) => {
+        const url = makeUrl(spot.token);
+        const image = makeQrImage(url);
+        const card = document.createElement("article");
+        card.className = "qr-card";
+        card.innerHTML = `
+          <h2>${spot.name}</h2>
+          <img alt="${spot.name} のQRコード" src="${image}">
+          <p>${url}</p>
+        `;
+        sheet.appendChild(card);
+      });
+    }
+
+    input.addEventListener("input", render);
+    document.getElementById("print-button").addEventListener("click", () => window.print());
+    render();
+  </script>
+</body>
+</html>
