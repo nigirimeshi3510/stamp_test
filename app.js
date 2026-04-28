@@ -22,6 +22,15 @@
   const redeemCode = document.getElementById("redeem-code");
   const redeemedCode = document.getElementById("redeemed-code");
   const redeemButton = document.getElementById("redeem-button");
+  const startScanButton = document.getElementById("start-scan-button");
+  const stopScanButton = document.getElementById("stop-scan-button");
+  const scannerView = document.getElementById("scanner-view");
+  const scannerVideo = document.getElementById("scanner-video");
+  const scannerHelp = document.getElementById("scanner-help");
+
+  let scannerStream = null;
+  let scannerTimer = null;
+  let detector = null;
 
   function readCollected() {
     try {
@@ -40,17 +49,7 @@
     scanResult.className = `panel notice is-visible${isError ? " is-error" : ""}`;
   }
 
-  function scanFromUrl() {
-    const params = new URLSearchParams(window.location.search);
-    const token = params.get("s");
-    if (!token) return;
-
-    const spot = CONFIG.spots.find((item) => item.token === token);
-    if (!spot) {
-      showMessage("このQRコードは認識できませんでした。貼り紙が最新か確認してください。", true);
-      return;
-    }
-
+  function collectSpot(spot) {
     const collected = new Set(readCollected());
     const wasCollected = collected.has(spot.id);
     collected.add(spot.id);
@@ -62,6 +61,85 @@
         : `${spot.name} のスタンプを取得しました。`,
       false
     );
+    render();
+  }
+
+  function scanToken(token) {
+    const spot = CONFIG.spots.find((item) => item.token === token);
+    if (!spot) {
+      showMessage("このQRコードは認識できませんでした。貼り紙が最新か確認してください。", true);
+      return false;
+    }
+    collectSpot(spot);
+    return true;
+  }
+
+  function scanFromUrl() {
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get("s");
+    if (!token) return;
+
+    scanToken(token);
+  }
+
+  function tokenFromScannedValue(value) {
+    try {
+      return new URL(value).searchParams.get("s");
+    } catch (error) {
+      return value;
+    }
+  }
+
+  function stopScanner() {
+    if (scannerTimer) {
+      window.clearInterval(scannerTimer);
+      scannerTimer = null;
+    }
+    if (scannerStream) {
+      scannerStream.getTracks().forEach((track) => track.stop());
+      scannerStream = null;
+    }
+    scannerVideo.srcObject = null;
+    scannerView.hidden = true;
+    stopScanButton.hidden = true;
+    startScanButton.hidden = false;
+  }
+
+  async function startScanner() {
+    if (!("BarcodeDetector" in window)) {
+      scannerHelp.textContent = "このブラウザではページ内QR読み取りに対応していません。iPhone標準カメラでQRを読み取ってください。";
+      showMessage("ページ内カメラ読み取りに対応していないブラウザです。標準カメラでQRを読み取ってください。", true);
+      return;
+    }
+
+    try {
+      detector = detector || new BarcodeDetector({ formats: ["qr_code"] });
+      scannerStream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: { ideal: "environment" } },
+        audio: false
+      });
+      scannerVideo.srcObject = scannerStream;
+      await scannerVideo.play();
+      scannerView.hidden = false;
+      stopScanButton.hidden = false;
+      startScanButton.hidden = true;
+      scannerHelp.textContent = "QRコードを枠の中に入れてください。読み取ると自動で止まります。";
+
+      scannerTimer = window.setInterval(async () => {
+        if (!detector || scannerVideo.readyState < 2) return;
+        const codes = await detector.detect(scannerVideo);
+        if (codes.length === 0) return;
+
+        const token = tokenFromScannedValue(codes[0].rawValue);
+        if (token && scanToken(token)) {
+          stopScanner();
+        }
+      }, 350);
+    } catch (error) {
+      stopScanner();
+      scannerHelp.textContent = "カメラを起動できませんでした。Safariのカメラ許可を確認してください。";
+      showMessage("カメラを起動できませんでした。ブラウザのカメラ許可を確認してください。", true);
+    }
   }
 
   function makeRedeemCode(collectedIds) {
@@ -113,6 +191,8 @@
     localStorage.setItem(redeemedKey, "true");
     render();
   });
+  startScanButton.addEventListener("click", startScanner);
+  stopScanButton.addEventListener("click", stopScanner);
 
   scanFromUrl();
   render();
