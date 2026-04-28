@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>QRスタンプラリー</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero" aria-labelledby="page-title">
+      <div class="brand-mark" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div>
+        <p class="eyebrow">QR Stamp Rally</p>
+        <h1 id="page-title">QRスタンプラリー</h1>
+        <p class="lead">3か所のQRコードを読み取って、景品交換画面を係員に見せてください。</p>
+      </div>
+    </section>
+
+    <section class="panel notice" id="scan-result" aria-live="polite"></section>
+
+    <section class="panel">
+      <div class="panel-heading">
+        <h2>スタンプ状況</h2>
+        <span class="progress-text" id="progress-text">0 / 3</span>
+      </div>
+      <div class="progress-track" aria-hidden="true">
+        <span id="progress-bar"></span>
+      </div>
+      <div class="stamp-grid" id="stamp-grid"></div>
+    </section>
+
+    <section class="reward panel" id="reward-panel" hidden>
+      <p class="eyebrow">Complete</p>
+      <h2>景品交換できます</h2>
+      <p>この画面を係員に見せてください。係員確認後、「交換済みにする」を押します。</p>
+      <div class="redeem-code" id="redeem-code"></div>
+      <button class="primary-button" id="redeem-button" type="button">交換済みにする</button>
+    </section>
+
+    <section class="reward panel muted" id="redeemed-panel" hidden>
+      <p class="eyebrow">Redeemed</p>
+      <h2>交換済み</h2>
+      <p>この端末では景品交換済みとして記録されています。</p>
+      <div class="redeem-code" id="redeemed-code"></div>
+    </section>
+
+    <section class="panel compact">
+      <h2>遊び方</h2>
+      <ol>
+        <li>会場内のQRコードを読み取ります。</li>
+        <li>3つすべて集めると景品交換画面が表示されます。</li>
+        <li>係員に画面を見せて景品と交換します。</li>
+      </ol>
+    </section>
+  </main>
+
+  <script src="app.js"></script>
+</body>
+</html>
