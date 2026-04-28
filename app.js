@@ -11,17 +11,11 @@
   };
 
   const storageKey = `qr-rally:${CONFIG.eventId}`;
-  const redeemedKey = `qr-rally:${CONFIG.eventId}:redeemed`;
 
   const scanResult = document.getElementById("scan-result");
   const progressText = document.getElementById("progress-text");
   const progressBar = document.getElementById("progress-bar");
   const stampGrid = document.getElementById("stamp-grid");
-  const rewardPanel = document.getElementById("reward-panel");
-  const redeemedPanel = document.getElementById("redeemed-panel");
-  const redeemCode = document.getElementById("redeem-code");
-  const redeemedCode = document.getElementById("redeemed-code");
-  const redeemButton = document.getElementById("redeem-button");
 
   function readCollected() {
     try {
@@ -40,11 +34,17 @@
     scanResult.className = `panel notice is-visible${isError ? " is-error" : ""}`;
   }
 
+  function isComplete(collected) {
+    const collectedSet = new Set(collected);
+    return CONFIG.spots.every((spot) => collectedSet.has(spot.id));
+  }
+
   function collectSpot(spot) {
     const collected = new Set(readCollected());
     const wasCollected = collected.has(spot.id);
     collected.add(spot.id);
-    writeCollected(Array.from(collected));
+    const collectedIds = Array.from(collected);
+    writeCollected(collectedIds);
 
     showMessage(
       wasCollected
@@ -53,6 +53,9 @@
       false
     );
     render();
+    if (isComplete(collectedIds)) {
+      window.location.href = "complete.html";
+    }
   }
 
   function scanToken(token) {
@@ -73,28 +76,14 @@
     scanToken(token);
   }
 
-  function makeRedeemCode(collectedIds) {
-    const seed = `${CONFIG.eventId}:${collectedIds.sort().join(",")}`;
-    let hash = 0;
-    for (let index = 0; index < seed.length; index += 1) {
-      hash = (hash * 31 + seed.charCodeAt(index)) >>> 0;
-    }
-    return String(hash).slice(-6).padStart(6, "0");
-  }
-
   function render() {
     const collected = readCollected();
     const collectedSet = new Set(collected);
     const count = CONFIG.spots.filter((spot) => collectedSet.has(spot.id)).length;
     const percent = Math.round((count / CONFIG.requiredCount) * 100);
-    const code = makeRedeemCode(collected);
-    const isComplete = count >= CONFIG.requiredCount;
-    const isRedeemed = localStorage.getItem(redeemedKey) === "true";
 
     progressText.textContent = `${count} / ${CONFIG.requiredCount}`;
     progressBar.style.width = `${Math.min(percent, 100)}%`;
-    redeemCode.textContent = code;
-    redeemedCode.textContent = code;
 
     stampGrid.innerHTML = "";
     CONFIG.spots.forEach((spot, index) => {
@@ -109,19 +98,11 @@
       stampGrid.appendChild(card);
     });
 
-    rewardPanel.hidden = !isComplete || isRedeemed;
-    redeemedPanel.hidden = !isComplete || !isRedeemed;
+    if (isComplete(collected)) {
+      window.location.replace("complete.html");
+    }
   }
 
-  redeemButton.addEventListener("click", () => {
-    const pin = window.prompt("係員用PINを入力してください");
-    if (pin !== CONFIG.staffPin) {
-      showMessage("PINが違います。係員に確認してください。", true);
-      return;
-    }
-    localStorage.setItem(redeemedKey, "true");
-    render();
-  });
   scanFromUrl();
   render();
 })();
