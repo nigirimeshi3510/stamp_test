@@ -1,40 +1,4 @@
-# QRスタンプラリー
+# QRスタンプラリーのテスト
 
-3か所のQRコードを読み取ると、景品交換画面が表示される静的サイトです。GitHub PagesやXserverの公開フォルダにそのままアップロードして使えます。
+https://nigirimeshi3510.github.io/stamp_test/print.html
 
-## ファイル
-
-- `index.html`: 参加者が開くスタンプラリー画面
-- `styles.css`: 画面デザイン
-- `app.js`: スタンプ取得、達成判定、交換済み処理
-- `print.html`: QRコード印刷用ページ
-
-## GitHub Pagesで使う場合
-
-公開URLは次の形式です。
-
-```text
-https://nigirimeshi3510.github.io/stamp_test/
-```
-
-`print.html` を開くと、このURLを使った参加者入口QRとスポットQRを作れます。
-
-## 設定変更
-
-`app.js` と `print.html` の `spots` に同じ内容を設定してください。
-
-```js
-{ id: "spot-a", token: "A7K2-MORI", name: "スポット A" }
-```
-
-- `id`: 内部保存用の識別子
-- `token`: QRコードURLに入れる合言葉
-- `name`: 画面に表示する場所名
-
-係員用PINは `app.js` の `staffPin` で変更できます。初期値は `2026` です。
-
-## 注意
-
-この版はサーバーやデータベースを使わない簡易版です。端末ごとのブラウザに進捗を保存するため、別端末に引き継ぎはできません。また、URLを共有されると現地に行かなくてもスタンプ取得できる可能性があります。
-
-厳密に不正対策や景品交換の一回制限をしたい場合は、PHPとデータベース、またはGoogleスプレッドシート連携などのサーバー側記録を追加する構成にするのがおすすめです。
