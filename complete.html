@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>景品交換画面 | QRスタンプラリー</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <main class="app-shell">
+    <section class="hero compact-hero" aria-labelledby="page-title">
+      <div class="brand-mark" aria-hidden="true">
+        <span></span>
+        <span></span>
+        <span></span>
+      </div>
+      <div>
+        <p class="eyebrow">Complete</p>
+        <h1 id="page-title">景品交換できます</h1>
+        <p class="lead">この画面を係員に見せてください。</p>
+      </div>
+    </section>
+
+    <section class="reward panel" id="reward-panel">
+      <p class="eyebrow">Redeem Code</p>
+      <h2>引換コード</h2>
+      <div class="redeem-code" id="redeem-code"></div>
+      <p>係員確認後、「交換済みにする」を押します。</p>
+      <button class="primary-button" id="redeem-button" type="button">交換済みにする</button>
+    </section>
+
+    <section class="reward panel muted" id="redeemed-panel" hidden>
+      <p class="eyebrow">Redeemed</p>
+      <h2>交換済み</h2>
+      <p>この端末では景品交換済みとして記録されています。</p>
+      <div class="redeem-code" id="redeemed-code"></div>
+    </section>
+
+    <section class="panel compact">
+      <h2>確認</h2>
+      <p class="lead">3つすべてのスタンプ取得が確認できた端末だけ、このページを表示できます。</p>
+    </section>
+  </main>
+
+  <script src="complete.js"></script>
+</body>
+</html>
