@@ -43,6 +43,10 @@ button {
   min-height: 190px;
 }
 
+.compact-hero {
+  min-height: 150px;
+}
+
 .brand-mark {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
