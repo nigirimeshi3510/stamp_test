@@ -4,8 +4,72 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>完了</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --ink: #20242a;
+      --accent: #0f8f82;
+      --accent-2: #e45f3a;
+      --paper: #fffdf8;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      display: grid;
+      place-items: center;
+      min-height: 100vh;
+      margin: 0;
+      padding: 24px;
+      font-family: "Yu Gothic", "Hiragino Kaku Gothic ProN", Meiryo, system-ui, sans-serif;
+      color: var(--ink);
+      background:
+        linear-gradient(135deg, rgba(15, 143, 130, 0.16), rgba(228, 95, 58, 0.14)),
+        #f7f5ef;
+    }
+
+    .complete-card {
+      display: grid;
+      place-items: center;
+      width: min(420px, 100%);
+      min-height: 260px;
+      padding: 36px 24px;
+      border: 2px solid var(--ink);
+      border-radius: 8px;
+      background: var(--paper);
+      box-shadow: 10px 10px 0 var(--accent);
+      text-align: center;
+    }
+
+    .complete-mark {
+      display: grid;
+      place-items: center;
+      width: 76px;
+      height: 76px;
+      margin-bottom: 22px;
+      border: 2px solid var(--ink);
+      border-radius: 50%;
+      color: #fff;
+      background: var(--accent-2);
+      font-size: 2rem;
+      font-weight: 900;
+    }
+
+    p {
+      margin: 0;
+      font-size: clamp(1.8rem, 10vw, 3.4rem);
+      font-weight: 900;
+      line-height: 1.22;
+      letter-spacing: 0;
+    }
+  </style>
 </head>
 <body>
-  <p>次の執行部会は　5月12日</p>
+  <main class="complete-card" aria-label="達成ページ">
+    <div class="complete-mark" aria-hidden="true">✓</div>
+    <p>次の執行部会は　5月12日</p>
+  </main>
 </body>
 </html>
