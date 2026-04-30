@@ -16,6 +16,8 @@
   const progressText = document.getElementById("progress-text");
   const progressBar = document.getElementById("progress-bar");
   const stampGrid = document.getElementById("stamp-grid");
+  const completePanel = document.getElementById("complete-panel");
+  const completeButton = document.getElementById("complete-button");
 
   function readCollected() {
     try {
@@ -53,9 +55,6 @@
       false
     );
     render();
-    if (isComplete(collectedIds)) {
-      window.location.href = "complete.html";
-    }
   }
 
   function scanToken(token) {
@@ -98,10 +97,12 @@
       stampGrid.appendChild(card);
     });
 
-    if (isComplete(collected)) {
-      window.location.replace("complete.html");
-    }
+    completePanel.hidden = !isComplete(collected);
   }
+
+  completeButton.addEventListener("click", () => {
+    window.location.href = "complete.html";
+  });
 
   scanFromUrl();
   render();
